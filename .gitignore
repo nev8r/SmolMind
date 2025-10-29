@@ -1,0 +1,15 @@
+dataset
+model
+checkpoints
+out
+# 忽略所有 Python 编译缓存
+__pycache__/
+*/__pycache__/
+**/__pycache__/
+
+# 忽略 .pyc / .pyo / .pyd 文件
+*.py[cod]
+
+# 忽略 C 扩展编译产物
+*.so
+
