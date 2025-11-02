@@ -2,11 +2,9 @@ dataset
 model
 checkpoints
 out
-# 忽略所有 Python 编译缓存
-__pycache__/
-*/__pycache__/
-**/__pycache__/
 
+__pycache__/
+swanlog/
 # 忽略 .pyc / .pyo / .pyd 文件
 *.py[cod]
 

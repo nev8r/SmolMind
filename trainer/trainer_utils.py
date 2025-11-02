@@ -21,7 +21,7 @@ def Logger(content):
 
 # def get_lr(current_step, total_steps, lr):
 #     return lr / 10 + 0.5 * lr * (1 + math.cos(math.pi * current_step / total_steps))
-def get_lr(global_step, total_updates, base_lr, warmup_ratio=0.03, min_lr_ratio=0.05):
+def get_lr(global_step, total_updates, base_lr, warmup_ratio=0.03, min_lr_ratio=0.1):
     warmup = int(total_updates * warmup_ratio)
     min_lr = base_lr * min_lr_ratio
     if global_step < warmup:
@@ -145,3 +145,44 @@ class SkipBatchSampler(Sampler):
     def __len__(self):
         total_batches = (len(self.sampler) + self.batch_size - 1) // self.batch_size
         return max(0, total_batches - self.skip_batches)
+
+
+def fix_arg_types(args):
+    """
+    自动修复 argparse / YAML 合并后类型错误的问题。
+    将数字字符串自动转为 int / float，布尔字符串转为 bool。
+    """
+    import re
+
+    numeric_keys = [
+        "learning_rate", "grad_clip", "epochs", "batch_size",
+        "num_workers", "accumulation_steps", "log_interval",
+        "save_interval", "hidden_size", "num_hidden_layers",
+        "max_seq_len"
+    ]
+
+    bool_true = {"true", "yes", "1", "on"}
+    bool_false = {"false", "no", "0", "off"}
+
+    for key, val in vars(args).items():
+        # 只处理字符串类型
+        if isinstance(val, str):
+            v = val.strip().lower()
+
+            # ✅ 自动识别布尔值
+            if v in bool_true:
+                setattr(args, key, True)
+            elif v in bool_false:
+                setattr(args, key, False)
+
+            # ✅ 自动识别数字（支持科学计数法、负号、小数）
+            elif re.fullmatch(r"-?\d+(\.\d+)?(e-?\d+)?", v):
+                try:
+                    if any(c in v for c in [".", "e", "E", "-"]):
+                        setattr(args, key, float(val))
+                    else:
+                        setattr(args, key, int(val))
+                except ValueError:
+                    pass
+
+    return args

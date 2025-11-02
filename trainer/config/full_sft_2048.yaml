@@ -1,0 +1,8 @@
+save_weight: "full_sft(2048)"
+epochs: 2
+batch_size: 45
+learning_rate: 3e-7
+data_path: "../dataset/sft_2048_dedup.jsonl"
+use_wandb: true
+max_seq_len: 2048
+from_weight: full_sft(1024)
